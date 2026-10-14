@@ -7,13 +7,31 @@
 <style>
 *{box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 body{background:#0a0e14;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:16px}
-.app{max-width:600px;width:100%;background:#151a22;border-radius:24px;box-shadow:0 20px 40px rgba(0,0,0,.8);overflow:hidden;border:1px solid #2a313c}
+.app{max-width:600px;width:100%;background:#151a22;border-radius:24px;box-shadow:0 20px 40px rgba(0,0,0,.8);overflow:hidden;border:1px solid #2a313c;position:relative;min-height:600px}
+.intro{position:absolute;inset:0;background:linear-gradient(180deg,#0a0e14,#131a24);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:10;transition:opacity .5s}
+.intro.hide{opacity:0;pointer-events:none}
+.boy{width:120px;height:140px;position:relative;animation:sway 3s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+.boy .head{width:60px;height:60px;background:#f0c9a0;border-radius:50%;margin:0 auto;position:relative;box-shadow:inset -6px -4px 0 rgba(0,0,0,.08)}
+.boy .hair{position:absolute;top:-4px;left:-4px;right:-4px;height:30px;background:#3a2a1a;border-radius:30px 30px 0 0}
+.boy .body{width:80px;height:70px;background:#3a6a99;border-radius:20px 20px 10px 10px;margin:-6px auto 0}
+.boy .phone{position:absolute;bottom:20px;right:-12px;width:34px;height:52px;background:#0f1318;border-radius:6px;border:2px solid #2a313c;transform:rotate(-12deg)}
+.boy .phone::after{content:'';position:absolute;inset:4px;background:linear-gradient(180deg,#2b5278,#4a8ac9);border-radius:3px;animation:screen 2s ease-in-out infinite}
+@keyframes screen{0%,100%{opacity:.6}50%{opacity:1}}
+.notif{background:#1e2630;border:1px solid #2a313c;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:12px;max-width:320px;animation:notifIn .6s ease;cursor:pointer}
+.notif:active{transform:scale(.97)}
+@keyframes notifIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.notif .nicon{width:36px;height:36px;background:#d32f2f;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.notif .ntext{flex:1;color:#c9d4e0;font-size:13px;line-height:1.3}
+.notif .ntext strong{color:#e1e8ed;display:block;margin-bottom:2px;font-size:14px}
+.notif .badge{background:#d32f2f;color:#fff;font-size:11px;font-weight:700;padding:2px 6px;border-radius:10px}
+.intro .hint{color:#6c7a8a;font-size:13px;margin-top:8px}
 .header{background:#0f1318;padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2a313c}
 .avatar{width:40px;height:40px;background:#2a313c;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8b98a8}
 .header-info{flex:1}
 .header-info .name{color:#e1e8ed;font-weight:600;font-size:15px}
 .header-info .status{color:#6c7a8a;font-size:12px}
-.chat{padding:20px;min-height:380px;max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.chat{padding:20px;min-height:340px;max-height:50vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
 .message{max-width:85%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-wrap:break-word;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .message.scam{background:#1e2630;align-self:flex-start;border-bottom-left-radius:4px;color:#c9d4e0}
@@ -29,11 +47,15 @@ body{background:#0a0e14;display:flex;justify-content:center;align-items:center;m
 .btn-danger:hover{background:#e04545}
 .btn-secondary{background:#2a313c;color:#c9d4e0}
 .btn-secondary:hover{background:#3a4350}
+.btn-good{background:#2e7d32;color:#fff}
+.btn-good:hover{background:#388e3c}
+.choice-row{display:flex;flex-direction:column;gap:8px}
 .ending-card{background:#1a2129;border-radius:16px;padding:24px 20px;text-align:center;border:1px solid #2a313c;animation:fadeIn .4s ease}
 .ending-card .icon{font-size:40px;margin-bottom:12px}
 .ending-card h2{color:#e1e8ed;margin:0 0 10px;font-size:18px}
 .ending-card p{color:#8b98a8;font-size:14px;line-height:1.6;margin:0 0 16px}
 .ending-card .highlight{color:#ff6b6b;font-weight:700;font-size:16px}
+.ending-card .highlight-good{color:#4caf50;font-weight:700;font-size:16px}
 .ending-card .article{background:#0f1318;padding:10px 14px;border-radius:12px;margin:12px 0;font-size:14px;color:#c9d4e0}
 .ending-card .article strong{color:#ff8a8a}
 .legal-warning{font-size:12px;color:#6c7a8a;margin-top:14px;line-height:1.5}
@@ -49,10 +71,23 @@ body{background:#0a0e14;display:flex;justify-content:center;align-items:center;m
 </head>
 <body>
 <div class="app">
+<div class="intro" id="intro">
+<div class="boy">
+<div class="head"><div class="hair"></div></div>
+<div class="body"></div>
+<div class="phone"></div>
+</div>
+<div class="notif" id="notif" style="display:none">
+<div class="nicon">💬</div>
+<div class="ntext"><strong>Неизвестный</strong>Привет. Есть разговор. Напиши мне.</div>
+<div class="badge">1</div>
+</div>
+<div class="hint" id="hint" style="display:none">Нажми на сообщение, чтобы открыть чат</div>
+</div>
 <div class="header">
 <div class="avatar">👤</div>
 <div class="header-info">
-<div class="name" id="contactName">Служба безопасности банка</div>
+<div class="name" id="contactName">Неизвестный</div>
 <div class="status" id="contactStatus">в сети</div>
 </div>
 </div>
@@ -60,132 +95,130 @@ body{background:#0a0e14;display:flex;justify-content:center;align-items:center;m
 <div class="actions" id="actions"></div>
 </div>
 <script>
-// РАЗГОВОР №1 - СЛУЖБА БЕЗОПАСНОСТИ БАНКА
-const dialogue1=[
-{type:'scam',text:'Здравствуйте. Это служба безопасности вашего банка. Мы зафиксировали подозрительную активность по вашему счёту.'},
-{type:'user',text:'Какая активность? Я ничего не делал.'},
-{type:'scam',text:'По нашим данным, с вашего устройства был совершён вход в личный кабинет из другого региона. Мы предполагаем, что данные вашей карты утекли в сеть.'},
-{type:'user',text:'Как утекли? Что мне делать?'},
-{type:'scam',text:'Вам нужно срочно выполнить несколько действий, чтобы мы могли обезопасить ваши средства. Прямо сейчас мы видим попытки перевода на подозрительные счета.'},
-{type:'user',text:'Хорошо, говорите.'},
-{type:'scam',text:'Для начала вам нужно снять все средства и перевести их на защищённый счёт, который мы откроем для вас. Это временная мера.'},
-{type:'user',text:'Ладно. А что потом?'},
-{type:'scam',text:'Потом мы вернём их обратно. Но есть проблема. Мы проверили ваш номер телефона и обнаружили, что с него ранее были зафиксированы звонки в запрещённые организации. Это очень серьёзно.'},
-{type:'user',text:'Какие ещё организации? Я никуда не звонил!'},
-{type:'scam',text:'По нашим данным, ваш номер использовался для связи с лицами, подозреваемыми в террористической деятельности. Мы обязаны передать информацию в ФСБ. Вас могут обвинить в пособничестве.',threat:true},
-{type:'user',text:'Это бред! Я не имею к этому отношения!'},
-{type:'scam',text:'Мы знаем, что вы можете быть невиновны. Но данные уже ушли в базу. Чтобы закрыть этот вопрос, вам нужно выполнить одно задание. Это единственный способ удалить ваши данные из системы.'},
-{type:'user',text:'Что за задание?'},
-{type:'scam',text:'Есть одна заправка, которую использует группа, связанная с террористами. Нужно устроить там небольшой поджог. Это отвлечёт внимание, и мы сможем удалить все компрометирующие данные.',threat:true},
-{type:'user',text:'Вы серьёзно? Я не буду ничего поджигать!'},
-{type:'scam',text:'Если вы откажетесь, завтра же ваши данные будут переданы в следственный комитет. Вас задержат по статье 205 УК РФ. До 15 лет лишения свободы.',threat:true},
-{type:'user',text:'...'},
-{type:'scam',text:'У вас есть 30 минут. Адрес мы пришлём. Заправка на выезде из города. Возьмите канистру с бензином. Мы будем следить.'},
-{type:'system',text:'Вы сделали то, что вам сказали. Через некоторое время пришло сообщение.'},
-{type:'scam',text:'Хорошо. Мы получили сигнал. Но ваши действия попали на камеры. Теперь это уже не удалить. С вами свяжутся.'},
-{type:'system',text:'Вас задержали. Следственный комитет предъявил обвинение.'}
-];
+// === СЦЕНАРИЙ: КАЖДЫЙ ШАГ — РЕПЛИКА МОШЕННИКА + ВАРИАНТЫ ОТВЕТА ===
+// next — id следующего шага, или 'end_bad', или 'end_good'
+const steps={
+s1:{
+scam:'Привет. Ты ведь Артём? Я по поводу работы. Есть хороший вариант, но нужно доверие.',
+options:[
+{label:'Да, я Артём. Что за работа?',next:'s2'},
+{label:'Кто вы такой?',next:'s2b'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s2b:{
+scam:'Неважно кто я. Важно, что у тебя проблемы. Твои данные слиты в сеть.',
+options:[
+{label:'Какие данные?',next:'s3'},
+{label:'И что делать?',next:'s3'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s2:{
+scam:'Работа простая. Нужно выполнить одно небольшое дело. Оплата сразу.',
+options:[
+{label:'И что делать?',next:'s3'},
+{label:'Какое ещё дело?',next:'s3'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s3:{
+scam:'Мы видим, что с твоего номера были звонки в запрещённые организации. Это статья 205 УК РФ — пособничество терроризму.',
+options:[
+{label:'Это ошибка! Я никуда не звонил!',next:'s4'},
+{label:'И что теперь делать?',next:'s4'},
+{label:'Я не буду в этом участвовать',next:'s4b'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s4b:{
+scam:'Поздно отказываться. Данные уже в базе. Но есть способ удалить их.',
+options:[
+{label:'Какой способ?',next:'s4'},
+{label:'Я не буду этого делать',next:'s5'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s4:{
+scam:'Нужно поджечь заправку на выезде из города. Это отвлечёт внимание, и мы удалим твои данные.',
+options:[
+{label:'Я не буду этого делать',next:'s5'},
+{label:'Вы серьёзно? Это же преступление',next:'s5'},
+{label:'Хорошо, я согласен',next:'s6'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s5:{
+scam:'Тогда завтра твои данные уйдут в следственный комитет. Статья 205, часть 2. От 12 до 20 лет. Ты готов?',
+options:[
+{label:'Это шантаж',next:'s6b'},
+{label:'Я не буду этого делать',next:'s6b'},
+{label:'Ладно, я согласен',next:'s6'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s6b:{
+scam:'Последнее предупреждение. Либо ты делаешь, либо мы передаём дело. У тебя 10 минут.',
+options:[
+{label:'Хорошо, я сделаю',next:'s6'},
+{label:'Я не буду этого делать',next:'end_bad'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s6:{
+scam:'Умное решение. Адрес: выезд из города, заправка №4. Возьми канистру с бензином. Жду сигнала.',
+options:[
+{label:'Хорошо',next:'s7'},
+{label:'Я передумал',next:'end_bad'},
+{label:'Заблокировать',next:'end_good'}
+]
+},
+s7:{
+scam:'Сигнал получен. Но твои действия попали на камеры. Теперь это уже не удалить.',
+options:[
+{label:'Что?! Вы обещали!',next:'end_bad'},
+{label:'Это подстава!',next:'end_bad'},
+{label:'Заблокировать',next:'end_good'}
+]
+}
+};
 
-// РАЗГОВОР №2 - ФИНАНСОВЫЙ МОНИТОРИНГ
-const dialogue2=[
-{type:'scam',text:'Добрый день. Меня зовут Алексей, я из службы финансового мониторинга. У вас проблема с банковским счётом.'},
-{type:'user',text:'Что случилось?'},
-{type:'scam',text:'Мы зафиксировали, что с вашего счёта пытаются перевести деньги на счета, связанные с экстремистской деятельностью. Это может быть очень серьёзно для вас.'},
-{type:'user',text:'Я никому ничего не переводил.'},
-{type:'scam',text:'Мы понимаем. Скорее всего, ваши данные скомпрометированы. Но есть нюанс: на вас уже могут завести дело по статье 205.1 УК РФ — содействие терроризму.',threat:true},
-{type:'user',text:'Что за бред? Я ни при чём.'},
-{type:'scam',text:'Мы можем помочь. Но нужно, чтобы вы оказали содействие. Есть человек, который организует ячейку. Нам нужно, чтобы вы помогли его нейтрализовать. Физически.'},
-{type:'user',text:'Вы предлагаете мне кого-то убить?'},
-{type:'scam',text:'Нет, конечно. Просто испортить его машину. Поджечь. Это остановит его деятельность. Мы прикроем вас. Иначе ваши данные уйдут в ФСБ, и вас посадят как пособника.',threat:true},
-{type:'user',text:'Я не буду этого делать.'},
-{type:'scam',text:'Тогда пеняйте на себя. Завтра к вам придут. Статья 205, часть 2. От 12 до 20 лет. Вы готовы к этому?',threat:true},
-{type:'system',text:'Вы отказались. Но через день вас всё равно задержали по подозрению в причастности к террористической деятельности.'}
-];
-
-// РАЗГОВОР №3 - ОТДЕЛ ПО БОРЬБЕ С ЭКСТРЕМИЗМОМ
-const dialogue3=[
-{type:'scam',text:'Здравствуйте. Старший лейтенант Смирнов, отдел по борьбе с экстремизмом. Ваш номер засветился в переписке с запрещённой организацией.'},
-{type:'user',text:'Я ни с кем не переписывался!'},
-{type:'scam',text:'Есть данные, что вы получали инструкции по изготовлению взрывного устройства. Мы обязаны провести проверку.'},
-{type:'user',text:'Это ошибка! Я обычный человек!'},
-{type:'scam',text:'Ошибки быть не может. Но есть способ закрыть дело. Нужно изъять улики у одного человека. Он хранит компоненты у себя в гараже.'},
-{type:'user',text:'Какие ещё компоненты?'},
-{type:'scam',text:'Вам нужно проникнуть в гараж и устроить там возгорание. Это уничтожит улики. Иначе — статья 205, до 20 лет.',threat:true},
-{type:'user',text:'Вы требуете, чтобы я совершил преступление?'},
-{type:'scam',text:'Это не преступление, а помощь следствию. Если откажетесь — мы приедем с обыском прямо сейчас. И тогда уже никто не поможет.',threat:true},
-{type:'user',text:'...'},
-{type:'scam',text:'У вас 15 минут. Адрес гаража: улица Заводская, 14. Возьмите бензин. Всё должно выглядеть как случайное возгорание.'},
-{type:'system',text:'Вы выполнили задание. Но это было подставное задание — вас снимали на камеру.'},
-{type:'scam',text:'Спасибо за сотрудничество. Теперь у нас есть все доказательства. Вас задержат в течение часа.'},
-{type:'system',text:'Вас задержали. Предъявлено обвинение по статье 205 УК РФ.'}
-];
-
-// РАЗГОВОР №4 - СЛУЖБА БЕЗОПАСНОСТИ (ЖЁСТКИЙ)
-const dialogue4=[
-{type:'scam',text:'Это служба безопасности. Ваши данные проданы на чёрном рынке. Мы видим, что ими уже воспользовались.'},
-{type:'user',text:'Что мне делать?'},
-{type:'scam',text:'Слушайте внимательно. С вашего имени были отправлены сообщения с угрозами в адрес государственных объектов. Это тянет на статью 205.'},
-{type:'user',text:'Я ничего не отправлял!'},
-{type:'scam',text:'Неважно. Техника зафиксировала ваш IP. Чтобы удалить логи, нужно физически уничтожить сервер, который находится в одном здании.'},
-{type:'user',text:'Вы хотите, чтобы я что-то поджёг?'},
-{type:'scam',text:'Именно. Небольшой пожар в подсобке. Никто не пострадает. Зато все данные исчезнут. Иначе — уголовное дело и розыск.',threat:true},
-{type:'user',text:'Это незаконно!'},
-{type:'scam',text:'Незаконно — это то, что вы уже сделали. А мы предлагаем решение. Откажетесь — через час вас объявят в розыск. Выбор за вами.',threat:true},
-{type:'user',text:'Хорошо...'},
-{type:'scam',text:'Умное решение. Адрес: промышленная зона, склад 7. Возьмите горючую жидкость. Время пошло.'},
-{type:'system',text:'Вы отправились на место. Но там уже ждала полиция.'},
-{type:'system',text:'Вас задержали на месте преступления. Обвинение — статья 205 УК РФ.'}
-];
-  // РАЗГОВОР №5 - ЛОЖНЫЙ СОТРУДНИК ФСБ
-const dialogue5=[
-{type:'scam',text:'Капитан ФСБ Волков. Ваш аккаунт используется для координации ячейки. Мы ведём наблюдение.'},
-{type:'user',text:'Я не имею к этому отношения!'},
-{type:'scam',text:'Мы можем закрыть дело, если вы поможете нам выйти на организатора. Он живёт рядом с вами.'},
-{type:'user',text:'И что нужно сделать?'},
-{type:'scam',text:'У него в машине документация. Нужно, чтобы машина сгорела. Это уничтожит связь с вами. Если откажетесь — мы передадим дело в суд.',threat:true},
-{type:'user',text:'Вы предлагаете мне поджог?'},
-{type:'scam',text:'Это спецоперация. Вы действуете в интересах государства. Но если проболтаетесь — станете фигурантом дела о терроризме. Статья 205, от 10 лет.',threat:true},
-{type:'user',text:'...'},
-{type:'scam',text:'Адрес: улица Лесная, 22, чёрный внедорожник. Ночь. Возьмите спички и бензин. Ждём сигнала.'},
-{type:'system',text:'Вы выполнили задание. Но это была провокация.'},
-{type:'system',text:'Вас задержали. Следственный комитет предъявил обвинение по статье 205 УК РФ.'}
-];
-
-// ФИНАЛЬНЫЙ ЭКРАН
-const endingScreen={
+// === ФИНАЛЫ ===
+const endingBad={
 article:'Статья 205 УК РФ — Террористический акт',
 text:'Суд признал вас виновным в совершении террористического акта (поджог по заданию неустановленных лиц).',
 sentence:'Наказание: лишение свободы на срок от 10 до 15 лет.',
-warning:'Помните: мошенники используют страх и угрозы. Если с вами или вашими близкими произошла подобная ситуация — немедленно обратитесь в полицию. Ничего не будет, если ничего не было.',
-legal:'Настоящие сотрудники банка или правоохранительных органов никогда не требуют совершать преступления. Если вам угрожают — обращайтесь в полицию.'
+warning:'Помните: мошенники используют страх и угрозы. Если с вами или вашими близкими произошла подобная ситуация — немедленно обратитесь в полицию.',
+legal:'Настоящие сотрудники банка или правоохранительных органов никогда не требуют совершать преступления.'
 };
 
-// ЛОГИКА ПРИЛОЖЕНИЯ
-const dialogues=[dialogue1,dialogue2,dialogue3,dialogue4,dialogue5];
-const contactNames=['Служба безопасности банка','Финансовый мониторинг','Отдел по борьбе с экстремизмом','Служба безопасности','Сотрудник ФСБ'];
-let currentDialogueIndex=0;
-let stepIndex=0;
-let isEnding=false;
+const endingGood={
+title:'Вы заблокировали мошенника',
+text:'Вы не поддались на угрозы и заблокировали чат. Мошенник не получил от вас ни денег, ни действий.',
+highlight:'Ничего не произошло. Вы в безопасности.',
+warning:'Если с вами или вашими близкими произошла подобная ситуация — немедленно обратитесь в полицию. Ничего не будет, если ничего не было.',
+legal:'Настоящие сотрудники банка или правоохранительных органов никогда не требуют совершать преступления.'
+};
+  </script>
+  // === ЛОГИКА ПРИЛОЖЕНИЯ ===
+let blocked=false;
+
 const chatEl=document.getElementById('chat');
 const actionsEl=document.getElementById('actions');
+const introEl=document.getElementById('intro');
+const notifEl=document.getElementById('notif');
+const hintEl=document.getElementById('hint');
 const contactNameEl=document.getElementById('contactName');
 const contactStatusEl=document.getElementById('contactStatus');
 
 function scrollToBottom(){chatEl.scrollTop=chatEl.scrollHeight;}
 
-function addMessage(msg){
-if(msg.type==='system'){
+function addMessage(type,text){
 const div=document.createElement('div');
-div.className='message system';
-div.textContent=msg.text;
+div.className='message '+type;
+if(type==='scam'&&(text.includes('205')||text.includes('статья')||text.includes('ФСБ')||text.includes('комитет')))div.classList.add('threat');
+div.textContent=text;
 chatEl.appendChild(div);
-}else{
-const div=document.createElement('div');
-div.className='message '+msg.type;
-if(msg.threat)div.classList.add('threat');
-div.textContent=msg.text;
-chatEl.appendChild(div);
-}
 scrollToBottom();
 }
 
@@ -203,70 +236,90 @@ const el=document.getElementById('typing');
 if(el)el.remove();
 }
 
-function renderActions(){
-actionsEl.innerHTML='';
-if(isEnding){
-const btnEnd=document.createElement('button');
-btnEnd.className='btn btn-danger';
-btnEnd.textContent='Закончить';
-btnEnd.onclick=function(){
-window.close();
-alert('Спасибо. Помните: настоящие мошенники используют страх. Не поддавайтесь.');
-};
-const btnRestart=document.createElement('button');
-btnRestart.className='btn btn-secondary';
-btnRestart.textContent='Повторить (другой разговор)';
-btnRestart.onclick=function(){
-currentDialogueIndex=(currentDialogueIndex+1)%dialogues.length;
-stepIndex=0;
-isEnding=false;
-chatEl.innerHTML='';
-actionsEl.innerHTML='';
-startDialogue();
-};
-actionsEl.appendChild(btnEnd);
-actionsEl.appendChild(btnRestart);
-return;
-}
-const btn=document.createElement('button');
-btn.className='btn btn-primary';
-btn.textContent=stepIndex===0?'Начать':'Продолжить';
-btn.onclick=function(){advanceDialogue();};
-actionsEl.appendChild(btn);
+function clearActions(){actionsEl.innerHTML='';}
+
+// === ЗАСТАВКА ===
+setTimeout(function(){notifEl.style.display='flex';},1200);
+setTimeout(function(){hintEl.style.display='block';},2000);
+
+notifEl.addEventListener('click',function(){
+introEl.classList.add('hide');
+setTimeout(function(){introEl.style.display='none';},500);
+startChat();
+});
+
+function startChat(){
+contactNameEl.textContent='Неизвестный';
+contactStatusEl.textContent='в сети';
+blocked=false;
+clearActions();
+showStep('s1');
 }
 
-function advanceDialogue(){
-const currentDialogue=dialogues[currentDialogueIndex];
-if(stepIndex>=currentDialogue.length){showEnding();return;}
-const msg=currentDialogue[stepIndex];
-if(msg.type==='scam'){
-actionsEl.innerHTML='';
+// === ПОКАЗ ШАГА ===
+function showStep(id){
+if(blocked)return;
+if(id==='end_bad'){showBadEnding();return;}
+if(id==='end_good'){showGoodEnding();return;}
+
+const step=steps[id];
+if(!step){showBadEnding();return;}
+
+clearActions();
 showTyping();
+
 setTimeout(function(){
 removeTyping();
-addMessage(msg);
-stepIndex++;
-if(stepIndex<currentDialogue.length&&currentDialogue[stepIndex].type==='system'){
-setTimeout(function(){
-addMessage(currentDialogue[stepIndex]);
-stepIndex++;
-renderActions();
-},600);
-}else{
-renderActions();
-}
-},800);
-}else{
-addMessage(msg);
-stepIndex++;
-renderActions();
-}
+addMessage('scam',step.scam);
+renderChoices(step.options);
+},900);
 }
 
-function showEnding(){
-isEnding=true;
+// === ВАРИАНТЫ ОТВЕТА ===
+function renderChoices(options){
+clearActions();
+const row=document.createElement('div');
+row.className='choice-row';
+
+options.forEach(function(opt){
+let cls='btn-secondary';
+if(opt.next==='end_good')cls='btn-good';
+else if(opt.next==='end_bad')cls='btn-danger';
+else if(opt.next==='s6')cls='btn-danger';
+
+const btn=document.createElement('button');
+btn.className='btn '+cls;
+btn.textContent=opt.label;
+btn.onclick=function(){
+// Игрок отправляет сообщение
+addMessage('user',opt.label);
+clearActions();
+
+// Если это блокировка — сразу хороший финал
+if(opt.next==='end_good'){
+setTimeout(function(){showGoodEnding();},600);
+return;
+}
+
+// Иначе мошенник отвечает сам
+setTimeout(function(){showStep(opt.next);},700);
+};
+row.appendChild(btn);
+});
+
+actionsEl.appendChild(row);
+}
+
+// === ПЛОХОЙ ФИНАЛ ===
+function showBadEnding(){
+blocked=true;
 chatEl.innerHTML='';
 contactStatusEl.textContent='не в сети';
+
+// Сначала показываем системное сообщение
+addMessage('system','Вас задержали. Следственный комитет предъявил обвинение.');
+
+setTimeout(function(){
 const card=document.createElement('div');
 card.className='ending-card';
 const icon=document.createElement('div');
@@ -278,17 +331,17 @@ const p=document.createElement('p');
 p.textContent='Следственный комитет предъявил обвинение по статье:';
 const articleDiv=document.createElement('div');
 articleDiv.className='article';
-articleDiv.innerHTML='<strong>'+endingScreen.article+'</strong><br>'+
-'<span style="font-size:13px;color:#8b98a8;">'+endingScreen.text+'</span><br><br>'+
-'<span class="highlight">'+endingScreen.sentence+'</span>';
+articleDiv.innerHTML='<strong>'+endingBad.article+'</strong><br>'+
+'<span style="font-size:13px;color:#8b98a8;">'+endingBad.text+'</span><br><br>'+
+'<span class="highlight">'+endingBad.sentence+'</span>';
 const warningP=document.createElement('p');
 warningP.style.marginTop='16px';
 warningP.style.fontSize='13px';
 warningP.style.color='#8b98a8';
-warningP.textContent=endingScreen.warning;
+warningP.textContent=endingBad.warning;
 const legal=document.createElement('div');
 legal.className='legal-warning';
-legal.textContent=endingScreen.legal;
+legal.textContent=endingBad.legal;
 card.appendChild(icon);
 card.appendChild(h2);
 card.appendChild(p);
@@ -297,20 +350,77 @@ card.appendChild(warningP);
 card.appendChild(legal);
 chatEl.appendChild(card);
 scrollToBottom();
-renderActions();
+renderEndButtons();
+},700);
 }
 
-function startDialogue(){
-actionsEl.innerHTML='';
+// === ХОРОШИЙ ФИНАЛ ===
+function showGoodEnding(){
+blocked=true;
 chatEl.innerHTML='';
-stepIndex=0;
-isEnding=false;
-contactNameEl.textContent=contactNames[currentDialogueIndex];
-contactStatusEl.textContent='в сети';
-renderActions();
+contactStatusEl.textContent='заблокирован';
+
+addMessage('system','Вы заблокировали этот чат.');
+
+setTimeout(function(){
+const card=document.createElement('div');
+card.className='ending-card';
+const icon=document.createElement('div');
+icon.className='icon';
+icon.textContent='🛡️';
+const h2=document.createElement('h2');
+h2.textContent=endingGood.title;
+const p=document.createElement('p');
+p.textContent=endingGood.text;
+const articleDiv=document.createElement('div');
+articleDiv.className='article';
+articleDiv.innerHTML='<span class="highlight-good">'+endingGood.highlight+'</span>';
+const warningP=document.createElement('p');
+warningP.style.marginTop='16px';
+warningP.style.fontSize='13px';
+warningP.style.color='#8b98a8';
+warningP.textContent=endingGood.warning;
+const legal=document.createElement('div');
+legal.className='legal-warning';
+legal.textContent=endingGood.legal;
+card.appendChild(icon);
+card.appendChild(h2);
+card.appendChild(p);
+card.appendChild(articleDiv);
+card.appendChild(warningP);
+card.appendChild(legal);
+chatEl.appendChild(card);
+scrollToBottom();
+renderEndButtons();
+},700);
 }
 
-startDialogue();
+// === КНОПКИ ПОСЛЕ ФИНАЛА ===
+function renderEndButtons(){
+clearActions();
+
+const btnEnd=document.createElement('button');
+btnEnd.className='btn btn-danger';
+btnEnd.textContent='Закончить';
+btnEnd.onclick=function(){
+window.close();
+alert('Спасибо. Помните: настоящие мошенники используют страх. Не поддавайтесь.');
+};
+
+const btnRestart=document.createElement('button');
+btnRestart.className='btn btn-secondary';
+btnRestart.textContent='Повторить';
+btnRestart.onclick=function(){
+chatEl.innerHTML='';
+clearActions();
+blocked=false;
+contactStatusEl.textContent='в сети';
+showStep('s1');
+};
+
+actionsEl.appendChild(btnEnd);
+actionsEl.appendChild(btnRestart);
+}
 </script>
 </body>
 </html>
